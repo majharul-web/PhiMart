@@ -26,6 +26,11 @@ SECRET_KEY = 'django-insecure-_6cy$ktf@nrbn33y55k$t#y_4o1_3#3e9x43b7d5**9gwa7zzz
 DEBUG = True
 
 ALLOWED_HOSTS = []
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 AUTH_USER_MODEL = 'users.User'  # Set custom user model
 
 
@@ -42,10 +47,12 @@ INSTALLED_APPS = [
     'api',
     'product',
     'order',
-    'users'
+    'users',
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
