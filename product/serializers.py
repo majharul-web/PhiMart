@@ -37,3 +37,4 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Stock cannot be negative.")
         if attrs.get('price', 0) < 0:
             raise serializers.ValidationError("Price cannot be negative.")
+        return attrs
