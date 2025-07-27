@@ -58,8 +58,20 @@ def view_categories(request):
 
         
 
-@api_view()
+@api_view(['GET', 'PUT', 'DELETE'])
 def view_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
-    serializer = CategorySerializer(category)
-    return Response({"category": serializer.data})
+    if request.method == 'GET':
+        serializer = CategorySerializer(category)
+        return Response({"category": serializer.data})
+
+    elif request.method == 'PUT':
+        serializer = CategorySerializer(category, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"category": serializer.data})
+
+    elif request.method == 'DELETE':
+        category.delete()
+        deleted_category = CategorySerializer(category, context={'request': request})
+        return Response({"deleted_category": deleted_category.data}, status=status.HTTP_204_NO_CONTENT)
