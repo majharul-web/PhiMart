@@ -27,4 +27,13 @@ class ProductSerializer(serializers.ModelSerializer):
         tax_rate = 1.15
         return round(product.price * Decimal(tax_rate))
 
+    def validate_price(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Price must be greater than zero.")
+        return value
 
+    def validate(self, attrs):
+        if attrs.get('stock', 0) < 0:
+            raise serializers.ValidationError("Stock cannot be negative.")
+        if attrs.get('price', 0) < 0:
+            raise serializers.ValidationError("Price cannot be negative.")
