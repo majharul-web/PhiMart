@@ -4,20 +4,29 @@ from product.models import Product, Category
 from django.shortcuts import get_object_or_404
 from product.serializers import ProductSerializer, CategorySerializer
 from django.db.models import Count
+from rest_framework import status
 
 # Create your views here.
 
-@api_view()
+@api_view(['GET', 'POST'])
 def view_products(request):
-    products = Product.objects.select_related('category').all()
-    product_data = ProductSerializer(products, many=True, context={'request': request}).data
-    return Response({"products": product_data})
+    if request.method == 'GET':
+        products = Product.objects.select_related('category').all()
+        serializer = ProductSerializer(products, many=True, context={'request': request})
+        return Response({"products": serializer.data})
+
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view()
-def view_product(request,id):
-    product =get_object_or_404(Product, id=id)
-    product_data = ProductSerializer(product).data
-    return Response({"product": product_data})
+def view_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    serializer = ProductSerializer(product, context={'request': request})
+    return Response({"product": serializer.data})
 
 
 @api_view()
@@ -25,11 +34,11 @@ def view_categories(request):
     categories = Category.objects.annotate(
         product_count=Count('products')
     ).all()
-    category_data = CategorySerializer(categories, many=True).data
-    return Response({"categories": category_data})
+    serializer = CategorySerializer(categories, many=True)
+    return Response({"categories": serializer.data})
 
 @api_view()
 def view_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
-    category_data = CategorySerializer(category).data
-    return Response({"category": category_data})
+    serializer = CategorySerializer(category)
+    return Response({"category": serializer.data})
