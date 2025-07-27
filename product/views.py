@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from product.models import Product, Category
 from django.shortcuts import get_object_or_404
 from product.serializers import ProductSerializer, CategorySerializer
+from django.db.models import Count
 
 # Create your views here.
 
@@ -21,7 +22,9 @@ def view_product(request,id):
 
 @api_view()
 def view_categories(request):
-    categories = Category.objects.all()
+    categories = Category.objects.annotate(
+        product_count=Count('products')
+    ).all()
     category_data = CategorySerializer(categories, many=True).data
     return Response({"categories": category_data})
 
