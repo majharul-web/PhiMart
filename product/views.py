@@ -5,73 +5,73 @@ from django.shortcuts import get_object_or_404
 from product.serializers import ProductSerializer, CategorySerializer
 from django.db.models import Count
 from rest_framework import status
+from rest_framework.views import APIView 
 
-# Create your views here.
 
-@api_view(['GET', 'POST'])
-def view_products(request):
-    if request.method == 'GET':
+class ViewProducts(APIView):
+    def get(self, request):
         products = Product.objects.select_related('category').all()
         serializer = ProductSerializer(products, many=True, context={'request': request})
         return Response({"products": serializer.data})
 
-    elif request.method == 'POST':
+    def post(self, request):
         serializer = ProductSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def view_product(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'GET':
+class ViewProduct(APIView):
+    def get(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
         serializer = ProductSerializer(product, context={'request': request})
         return Response({"product": serializer.data})
 
-    elif request.method == 'PUT':
+    def put(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
         serializer = ProductSerializer(product, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"product": serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
         product.delete()
         deleted_product = ProductSerializer(product, context={'request': request})
         return Response({"deleted_product": deleted_product.data}, status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET', 'POST'])
-def view_categories(request):
-    if request.method == 'GET':
-        categories = Category.objects.annotate(
-                product_count=Count('products')
-        ).all()
-        serializer = CategorySerializer(categories, many=True)
-        return Response({"categories": serializer.data})
-
-    elif request.method == 'POST':
-        serializer = CategorySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def view_category(request, pk):
-    category = get_object_or_404(Category, pk=pk)
-    if request.method == 'GET':
+class ViewCategory(APIView):
+    def get(self, request, pk):
+        category = get_object_or_404(Category.objects.annotate(product_count=Count('products')).all(), pk=pk)
         serializer = CategorySerializer(category)
         return Response({"category": serializer.data})
 
-    elif request.method == 'PUT':
+    def put(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
         serializer = CategorySerializer(category, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"category": serializer.data})
 
-    elif request.method == 'DELETE':
+    def delete(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
         category.delete()
         deleted_category = CategorySerializer(category, context={'request': request})
         return Response({"deleted_category": deleted_category.data}, status=status.HTTP_204_NO_CONTENT)
+        
+
+
+
+class ViewCategories(APIView):
+    def get(self, request):
+        categories = Category.objects.annotate(product_count=Count('products')).all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response({"categories": serializer.data})
+
+    def post(self, request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
