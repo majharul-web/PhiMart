@@ -1,5 +1,5 @@
-from product.models import Product, Category
-from product.serializers import ProductSerializer, CategorySerializer
+from product.models import Product, Category,Review
+from product.serializers import ProductSerializer, CategorySerializer, ReviewSerializer
 from django.db.models import Count
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -25,3 +25,12 @@ class CategoryViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ReviewSerializer
+    def get_queryset(self):
+        product_id = self.kwargs['product_pk']
+        return Review.objects.filter(product_id=product_id).all()
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
