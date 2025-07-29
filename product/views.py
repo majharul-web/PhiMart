@@ -3,11 +3,21 @@ from product.serializers import ProductSerializer, CategorySerializer, ReviewSer
 from django.db.models import Count
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from product.filters import ProductFilter
+from rest_framework.filters import SearchFilter,OrderingFilter
+from product.paginations import DefaultPagination
 
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
+    pagination_class = DefaultPagination
+    search_fields = ['name', 'description']
+    ordering_fields = ['price', 'created_at']
+
 
     def get_serializer_context(self):
         return {'request': self.request}
