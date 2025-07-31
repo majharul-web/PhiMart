@@ -1,28 +1,22 @@
-from django.urls import path,include
-from product.views import ProductViewSet, CategoryViewSet,ReviewViewSet
+from django.urls import path, include
+from product.views import ProductViewSet, CategoryViewSet, ReviewViewSet
 from order.views import CartViewSet, CartItemViewSet
 from rest_framework_nested import routers
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register('products', ProductViewSet, basename='product')
 router.register('categories', CategoryViewSet, basename='category')
 router.register('carts', CartViewSet, basename='carts')
-router.register('cart-items', CartItemViewSet, basename='cart-items')
 
+# Nested routers
 product_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
 product_router.register('reviews', ReviewViewSet, basename='product-reviews')
 
 cart_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
-cart_router.register('items', CartItemViewSet, basename='cart-items')
+cart_router.register('items', CartItemViewSet, basename='cart-items-nested')  # Renamed basename
 
-
-
-# urlpatterns = router.urls
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(product_router.urls)),
     path('', include(cart_router.urls)),
-    
-    # If you want to include other URLs, you can add them here
-    # path('some-other-url/', include('some_app.urls')),
 ]
