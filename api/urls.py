@@ -9,8 +9,11 @@ router.register('categories', CategoryViewSet, basename='category')
 router.register('carts', CartViewSet, basename='carts')
 router.register('cart-items', CartItemViewSet, basename='cart-items')
 
-product_router = routers.NestedSimpleRouter(router, 'products', lookup='product')
+product_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
 product_router.register('reviews', ReviewViewSet, basename='product-reviews')
+
+cart_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
+cart_router.register('items', CartItemViewSet, basename='cart-items')
 
 
 
@@ -18,6 +21,7 @@ product_router.register('reviews', ReviewViewSet, basename='product-reviews')
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(product_router.urls)),
+    path('', include(cart_router.urls)),
     
     # If you want to include other URLs, you can add them here
     # path('some-other-url/', include('some_app.urls')),
