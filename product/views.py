@@ -54,6 +54,10 @@ class CategoryViewSet(ModelViewSet):
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
     def get_queryset(self):
         product_id = self.kwargs['product_pk']
         return Review.objects.filter(product_id=product_id).all()
