@@ -7,6 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from product.filters import ProductFilter
 from rest_framework.filters import SearchFilter,OrderingFilter
 from product.paginations import DefaultPagination
+from rest_framework.permissions import IsAdminUser, AllowAny
+from api.permissions import IsAdminOrReadOnly
 
 
 class ProductViewSet(ModelViewSet):
@@ -17,7 +19,14 @@ class ProductViewSet(ModelViewSet):
     pagination_class = DefaultPagination
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
+    permission_classes = [IsAdminOrReadOnly]  
+    
+    # permission_classes = [IsAdminUser]
 
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
+    #     return [IsAdminUser()]
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -32,6 +41,7 @@ class ProductViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.annotate(product_count=Count('products')).all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly] 
 
     def get_serializer_context(self):
         return {'request': self.request}
