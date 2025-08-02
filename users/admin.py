@@ -8,19 +8,22 @@ from users.models import User
 
 class UserAdmin(UserAdmin):
     model = User
-    list_display = ('email', 'first_name', 'last_name', 'phone_number', 'is_active')
+    list_display = ('email', 'first_name', 'last_name', 'is_active')
     list_filter = ('is_staff', 'is_active')
+
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'phone_number', 'address')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Personal Info', {'fields': ('first_name',
+         'last_name', 'address', 'phone_number')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active',
+         'is_superuser', 'groups', 'user_permissions')}),
+        ('Important Dates', {'fields': ('last_login', 'date_joined')})
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2','is_staff', 'is_active', )}
-        ),
+            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')
+        }),
     )
     search_fields = ('email',)
     ordering = ('email',)
