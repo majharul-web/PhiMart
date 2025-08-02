@@ -22,3 +22,8 @@ if __name__ == '__main__':
     main()
 
 # Admin@1#%
+
+# {
+#     "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NDIxOTI0OSwiaWF0IjoxNzU0MTMyODQ5LCJqdGkiOiJhNTFiZjZhNDY4Zjk0MTkzOWMzMzhmNzFhMTU3Yzg2OSIsInVzZXJfaWQiOiI0In0.WOQYFjbVGfxbx3RTcY2M7CGHHJZc-Rbiskdz3VRKJLg",
+#     "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU0MjE5MjQ5LCJpYXQiOjE3NTQxMzI4NDksImp0aSI6IjljYzM3MWNkZWE1NzRlYzZiMmFhMGI1ZTZmZDRhYjJjIiwidXNlcl9pZCI6IjQifQ.bSPGe4sy-2B96l-LCVzhMhpIUTzVPKLgvrN1YirrouM"
+# }
