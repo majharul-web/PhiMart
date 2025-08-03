@@ -42,6 +42,7 @@ class Order(models.Model):
         (DELIVERED, 'Delivered'),
         (CANCELED, 'Canceled'),
     ]
+    id=models.UUIDField(primary_key=True, editable=False,default=uuid4)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="orders")
     status = models.CharField(
@@ -51,7 +52,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Order {self.id} by {self.user.username} - {self.status}"
+        return f"Order {self.id} by {self.user.first_name} - {self.status}"
 
 
 class OrderItem(models.Model):
