@@ -60,6 +60,7 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'user','items', 'total_price','created_at']
+        read_only_fields = ['user']
 
     def get_total_price(self, cart: Cart):
         return sum(item.product.price * item.quantity for item in cart.items.all())
@@ -70,6 +71,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'quantity', 'price', 'total_price']
+        
+class CreateOrderItemSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField(write_only=True)
+
+    def validate_cart_id(self, cart_id):
+        if not Cart.objects.filter(pk=cart_id).exists():
+            raise serializers.ValidationError("Cart does not exist.")
+        
+        if not CartItem.objects.filter(cart_id=cart_id).exists():
+            raise serializers.ValidationError("Cart is empty.")
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
 
