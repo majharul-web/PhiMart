@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from order.models import Cart, CartItem, Order, OrderItem
-from order.serializers import CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer,OrderSerializer,CreateOrderItemSerializer
+from order.serializers import CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer,OrderSerializer,CreateOrderItemSerializer, UpdateOrderSerializer
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin,RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import serializers
 
 # Create your views here.
@@ -42,15 +42,23 @@ class CartItemViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
 
-    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete', 'patch', 'head', 'options']
     
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+
     def get_serializer_class(self):
         if self.request.method in ['POST']:
             return CreateOrderItemSerializer
+        elif self.request.method in ['PATCH']:
+            return UpdateOrderSerializer
         return OrderSerializer
     
     def get_serializer_context(self):
-        return {'user_id': self.request.user.id}
+        return {'user_id': self.request.user.id,'user': self.request.user}
 
     def get_queryset(self):
         if self.request.user.is_staff:

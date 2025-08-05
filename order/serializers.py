@@ -97,6 +97,27 @@ class CreateOrderItemSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return OrderSerializer(instance).data
 
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status']
+    
+    def update(self, instance, validated_data):
+        user = self.context['user']
+        new_status = validated_data.get('status')
+
+        # Delegate to service
+        if new_status == Order.CANCELED:
+            order = OrderService.cancel_order(order=instance, user=user)
+            return order
+        
+        if not user.is_staff:
+            raise serializers.ValidationError({
+                'detail': 'Only staff can update order status.'
+            })
+
+        # Regular update
+        return super().update(instance, validated_data)
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
