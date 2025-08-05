@@ -15,12 +15,17 @@ class CategorySerializer(serializers.ModelSerializer):
     # def calculate_product_count(self, category):
     #     return Product.objects.filter(category=category).count()
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id','image']
+        read_only_fields = ['created_at','id']
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'stock', 'category','price_with_tax']
-
+        fields = ['id', 'name', 'description', 'price', 'stock', 'category','price_with_tax', 'images']
+    images= ProductImageSerializer(many=True, read_only=True)
     category=serializers.HyperlinkedRelatedField(
             view_name='category-detail',
             queryset=Category.objects.all()
@@ -42,11 +47,7 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Price cannot be negative.")
         return attrs
     
-class ProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = ['image']
-        read_only_fields = ['created_at']
+
     
 
 class SimpleUserSerializer(serializers.ModelSerializer):
