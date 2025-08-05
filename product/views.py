@@ -1,5 +1,5 @@
 from product.models import Product, Category,Review
-from product.serializers import ProductSerializer, CategorySerializer, ReviewSerializer
+from product.serializers import ProductSerializer, CategorySerializer, ReviewSerializer, ProductImageSerializer
 from django.db.models import Count
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -43,6 +43,21 @@ class ProductViewSet(ModelViewSet):
         if product.stock > 10:
             return Response({"error": "Cannot delete product with stock greater than 10."}, status=400)
         return super().destroy(request, *args, **kwargs)
+    
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get_queryset(self):
+        product_id = self.kwargs['product_pk']
+        return Product.objects.get(id=product_id).images.all()
+    
+    def perform_create(self, serializer):
+        product_id = self.kwargs['product_pk']
+        serializer.save(product_id=product_id)
+    
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
 
 
 class CategoryViewSet(ModelViewSet):

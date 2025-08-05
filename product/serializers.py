@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from product.models import Product,Category,Review
+from product.models import Product,Category,Review,ProductImage
 from decimal import Decimal
 from django.contrib.auth import get_user_model
 
@@ -41,6 +41,14 @@ class ProductSerializer(serializers.ModelSerializer):
         if attrs.get('price', 0) < 0:
             raise serializers.ValidationError("Price cannot be negative.")
         return attrs
+    
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['image']
+        read_only_fields = ['created_at']
+    
+
 class SimpleUserSerializer(serializers.ModelSerializer):
     name= serializers.SerializerMethodField(method_name='get_name')
     class Meta:
