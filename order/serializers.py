@@ -2,6 +2,7 @@ from rest_framework import serializers
 from order.models import Cart, CartItem
 from product.models import Product
 from order.models import Order, OrderItem
+from order.services import OrderService
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
@@ -78,9 +79,24 @@ class CreateOrderItemSerializer(serializers.Serializer):
     def validate_cart_id(self, cart_id):
         if not Cart.objects.filter(pk=cart_id).exists():
             raise serializers.ValidationError("Cart does not exist.")
-        
         if not CartItem.objects.filter(cart_id=cart_id).exists():
             raise serializers.ValidationError("Cart is empty.")
+        return cart_id
+
+    def create(self, validated_data):
+        cart_id = validated_data['cart_id']
+        user_id = self.context['user_id']
+        
+        try:
+            order = OrderService.create_order(user_id=user_id, cart_id=cart_id)
+            return order
+        except Exception as e:
+            raise serializers.ValidationError(f"Failed to create order: {str(e)}")
+        
+    
+    def to_representation(self, instance):
+        return OrderSerializer(instance).data
+
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
