@@ -4,6 +4,8 @@ from product.models import Product
 from order.models import Order, OrderItem
 from order.services import OrderService
 
+class EmptySerializer(serializers.Serializer):
+    pass
 
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -102,22 +104,22 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['status']
     
-    def update(self, instance, validated_data):
-        user = self.context['user']
-        new_status = validated_data.get('status')
+    # def update(self, instance, validated_data):
+    #     user = self.context['user']
+    #     new_status = validated_data.get('status')
 
-        # Delegate to service
-        if new_status == Order.CANCELED:
-            order = OrderService.cancel_order(order=instance, user=user)
-            return order
+    #     # Delegate to service
+    #     if new_status == Order.CANCELED:
+    #         order = OrderService.cancel_order(order=instance, user=user)
+    #         return order
         
-        if not user.is_staff:
-            raise serializers.ValidationError({
-                'detail': 'Only staff can update order status.'
-            })
+    #     if not user.is_staff:
+    #         raise serializers.ValidationError({
+    #             'detail': 'Only staff can update order status.'
+    #         })
 
-        # Regular update
-        return super().update(instance, validated_data)
+    #     # Regular update
+    #     return super().update(instance, validated_data)
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
