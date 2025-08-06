@@ -10,10 +10,21 @@ from product.paginations import DefaultPagination
 from rest_framework.permissions import IsAdminUser, AllowAny, DjangoModelPermissions,DjangoModelPermissionsOrAnonReadOnly
 from api.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions
 from product.permissions import IsReviewAuthorReadOnly
+from drf_yasg.utils import swagger_auto_schema
 
 
 
 class ProductViewSet(ModelViewSet):
+    
+    """
+    API endpoint for managing products.
+     - Allows listing, retrieving, creating, updating, and deleting products.
+     - Supports filtering, searching, and ordering.
+     - Pagination is applied using DefaultPagination.
+     - Only admin users can create, update, or delete products.
+     - Regular users can view the product list and details.
+    
+    """
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -24,6 +35,22 @@ class ProductViewSet(ModelViewSet):
     
     permission_classes = [IsAdminOrReadOnly] 
      
+
+    def list(self, request, *args, **kwargs):
+        """
+        Provides a list of products with optional filtering, searching, and ordering.
+        """
+
+        return super().list(request, *args, **kwargs)
+    
+    @swagger_auto_schema(
+        operation_summary="Create a new product",
+        operation_description="Creates a new product with the provided details.",
+        request_body=ProductSerializer,
+        responses={201: ProductSerializer,400: 'Bad Request', 403: 'Forbidden'}
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
      
     # permission_classes = [DjangoModelPermissionsOrAnonReadOnly]  
     # permission_classes = [DjangoModelPermissions]  
@@ -45,6 +72,14 @@ class ProductViewSet(ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
 class ProductImageViewSet(ModelViewSet):
+    """
+    API endpoint for managing product images.
+     - Allows listing, retrieving, creating, updating, and deleting images for a specific product.
+     - Only admin users can create, update, or delete images.
+     - Regular users can view the images.
+
+    """
+    
     serializer_class = ProductImageSerializer
     permission_classes = [IsAdminOrReadOnly]
     
@@ -61,6 +96,12 @@ class ProductImageViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
+    """
+    API endpoint for managing product categories.
+     - Allows listing, retrieving, creating, updating, and deleting categories.
+     - Only admin users can create, update, or delete categories.
+     - Regular users can view the category list and details.
+    """
     queryset = Category.objects.annotate(product_count=Count('products')).all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly] 
@@ -69,14 +110,18 @@ class CategoryViewSet(ModelViewSet):
         return {'request': self.request}
 
 class ReviewViewSet(ModelViewSet):
+    """
+    API endpoint for managing product reviews.
+     - Allows listing, retrieving, creating, updating, and deleting reviews for a specific product.
+     - Only admin users can create, update, or delete reviews.
+     - Regular users can view the reviews.
+    """
     serializer_class = ReviewSerializer
     permission_classes = [IsReviewAuthorReadOnly]
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
-
-
     def get_queryset(self):
         product_id = self.kwargs['product_pk']
         return Review.objects.filter(product_id=product_id).all()

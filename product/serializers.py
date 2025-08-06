@@ -9,7 +9,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'description', 'product_count']
-    product_count = serializers.IntegerField(read_only=True)
+    product_count = serializers.IntegerField(read_only=True,help_text="Number of products in this category")
         
     # product_count = serializers.SerializerMethodField(method_name='calculate_product_count')
     # def calculate_product_count(self, category):
