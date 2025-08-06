@@ -84,15 +84,17 @@ class ProductImageViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     
     def get_queryset(self):
-        product_id = self.kwargs['product_pk']
+        if getattr(self, 'swagger_fake_view', False):
+            return Product.objects.none()
+        product_id = self.kwargs.get('product_pk')
         return Product.objects.get(id=product_id).images.all()
     
     def perform_create(self, serializer):
-        product_id = self.kwargs['product_pk']
+        product_id = self.kwargs.get('product_pk')
         serializer.save(product_id=product_id)
     
     def get_serializer_context(self):
-        return {'product_id': self.kwargs['product_pk']}
+        return {'product_id': self.kwargs.get('product_pk')}
 
 
 class CategoryViewSet(ModelViewSet):
@@ -120,11 +122,13 @@ class ReviewViewSet(ModelViewSet):
     permission_classes = [IsReviewAuthorReadOnly]
     
     def perform_create(self, serializer):
+        if getattr(self, 'swagger_fake', False):
+            return super().perform_create(serializer)
         serializer.save(user=self.request.user)
     
     def get_queryset(self):
-        product_id = self.kwargs['product_pk']
+        product_id = self.kwargs.get('product_pk')
         return Review.objects.filter(product_id=product_id).all()
     def get_serializer_context(self):
-        return {'product_id': self.kwargs['product_pk']}
+        return {'product_id': self.kwargs.get('product_pk')}
 
