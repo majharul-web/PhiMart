@@ -85,7 +85,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 
 For any questions or issues, please open an issue on the GitHub repository or contact the project
-maintainer at [your-email@example.com](mailto:majharul.dev.alt@gmail.com)
+maintainer at [majharul.dev.alt@gmail.com](mailto:majharul.dev.alt@gmail.com)
 
 ## Acknowledgements
 
