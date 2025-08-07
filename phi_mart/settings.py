@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_6cy$ktf@nrbn33y55k$t#y_4o1_3#3e9x43b7d5**9gwa7zzz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".vercel.app", "localhost", "127.0.0.1", "aws-0-ap-southeast-1.pooler.supabase.com", "phi-mart.vercel.app"]
 INTERNAL_IPS = [
     # ...
     "127.0.0.1",
@@ -39,6 +39,7 @@ AUTH_USER_MODEL = 'users.User'  # Set custom user model
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -146,6 +148,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# white noise settings
+STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_FILES_DIRS = BASE_DIR / "static"
+STATIC_FILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # cloudinary settings
 cloudinary.config( 
