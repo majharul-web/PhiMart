@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator,FileExtensionValidator
 from product.validators import validate_file_size
+from cloudinary.models import CloudinaryField
+
 
 # Create your models here.
 
@@ -32,7 +34,8 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='products/images/',validators=[validate_file_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
+    image = CloudinaryField('image', validators=[validate_file_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
+    # image = models.ImageField(upload_to='products/images/',validators=[validate_file_size, FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
     created_at = models.DateTimeField(auto_now_add=True)
     # file = models.FileField(upload_to='products/files/', blank=True, null=True,validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])])
 
